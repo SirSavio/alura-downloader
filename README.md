@@ -26,3 +26,5 @@ Antes de seguir o processo abaixo edite o config.json para as suas informações
 
 # Considerações & Alerta
 Baseado no [projeto](https://github.com/v4p0r/gengar) do [v4p0r](https://github.com/v4p0r) os desenvolvedores não assumem nenhuma responsabilidade e não são responsáveis ​​por qualquer uso indevido.
+
+README.md baseado no README do [v4p0r](https://github.com/v4p0r) para o [projeto](https://github.com/v4p0r/gengar)
