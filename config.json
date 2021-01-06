@@ -1,0 +1,7 @@
+{
+	"email": "exemple@exemple.com",
+	"password": "12345678",
+	"courses": [
+		"https://cursos.alura.com.br/course/kubernetes-pods-services-configmap"
+	]
+}
