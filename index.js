@@ -45,7 +45,7 @@ main();
     	let infos = JSON.parse(parse);
 
     	logger.log(3, {id: infos.id, slug: infos.slug, name: infos.name, totalVideoTime: infos.totalVideoTime});
-    	let folderName = infos.name.replace(':', ' -');
+		let folderName = infos.name.replace(':', ' -');
     	create_folder(folderName)
 
     	for (const title of infos.sections) {
@@ -176,8 +176,8 @@ main();
  * @param {string} dir 
  */
  function create_folder(dir) {
- 	if (!fs.existsSync(dir)) {
- 		fs.mkdirSync(dir);
+ 	if (!fs.existsSync(__dirname + dir)) {
+ 		fs.mkdirSync(__dirname + dir);
  	}
  }
 
