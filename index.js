@@ -176,8 +176,8 @@ main();
  * @param {string} dir 
  */
  function create_folder(dir) {
- 	if (!fs.existsSync(__dirname + dir)) {
- 		fs.mkdirSync(__dirname + dir);
+ 	if (!fs.existsSync(__dirname + '/' + dir)) {
+ 		fs.mkdirSync(__dirname + '/' + dir);
  	}
  }
 

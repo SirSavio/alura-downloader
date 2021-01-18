@@ -1,5 +1,5 @@
 {
-  "name": "AluraVideodownloader",
+  "name": "aluravideodownloader",
   "version": "1.0.0",
   "description": "Alura Video downloader",
   "main": "index.js",
@@ -18,5 +18,13 @@
     "ansi-colors": "^4.1.1",
     "axios": "^0.19.2",
     "request": "^2.88.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SirSavio/alura-downloader.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SirSavio/alura-downloader/issues"
+  },
+  "homepage": "https://github.com/SirSavio/alura-downloader#readme"
 }
