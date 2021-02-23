@@ -1,7 +1,7 @@
 {
-	"email": "presidencia@nobugs.com.br",
-	"password": "#ALURAmasc0tegub",
-	"courses": [
-		"https://cursos.alura.com.br/course/kubernetes-pods-services-configmap"
+	"email": "lucasrti@hotmail.com",
+	"password": "kika13",
+	"courses": ["https://cursos.alura.com.br/course/aws-certified-cloud-practitioner-domain-1-e-2"],
+	"formations": [
 	]
 }
