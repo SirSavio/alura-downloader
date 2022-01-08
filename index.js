@@ -45,19 +45,20 @@ main();
     	let infos = JSON.parse(parse);
 
     	logger.log(3, {id: infos.id, slug: infos.slug, name: infos.name, totalVideoTime: infos.totalVideoTime});
-		let folderName = infos.name.replace(':', ' -');
+    	let folderName = infos.name.replace(':', ' -');
     	create_folder(folderName)
 
     	for (const title of infos.sections) {
-
+		
     		logger.log(4, {title: title.titulo});
-    		create_folder(`${folderName}/${title.position} - ${title.titulo}`);
+
+    		create_folder(`${folderName}/${title.position} - ${title.titulo.replace("/", "-")}`);
 
     		for (const lesson of title.videos) {
     			let folderLesson = lesson.nome.replace(':', ' -');
     			let url = await get_video(lesson.id, infos.slug, access_token);
     			logger.log(5, {lesson: lesson.nome, id: lesson.id})
-    			video_download(`${folderName}/${title.position} - ${title.titulo}/${lesson.position} - ${folderLesson}.mp4`, url, folderLesson)
+    			video_download(`${folderName}/${title.position} - ${title.titulo.replace("/", "-")}/${lesson.position} - ${folderLesson}.mp4`, url, folderLesson)
     		}
 
     	}
@@ -176,8 +177,8 @@ main();
  * @param {string} dir 
  */
  function create_folder(dir) {
- 	if (!fs.existsSync(__dirname + '/' + dir)) {
- 		fs.mkdirSync(__dirname + '/' + dir);
+ 	if (!fs.existsSync(dir)) {
+ 		fs.mkdirSync(dir);
  	}
  }
 
