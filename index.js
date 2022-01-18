@@ -45,24 +45,30 @@ main();
     	let infos = JSON.parse(parse);
 
     	logger.log(3, {id: infos.id, slug: infos.slug, name: infos.name, totalVideoTime: infos.totalVideoTime});
-		let folderName = infos.name.replace(':', ' -');
+		let folderName = tratarTitulo(infos.name);
     	create_folder(folderName)
 
     	for (const title of infos.sections) {
-
-    		logger.log(4, {title: title.titulo});
-    		create_folder(`${folderName}/${title.position} - ${title.titulo}`);
+			let tituloTratado = tratarTitulo(title.titulo);
+    		logger.log(4, {title: tituloTratado});
+    		create_folder(`${folderName}/${title.position} - ${tituloTratado}`);
 
     		for (const lesson of title.videos) {
-    			let folderLesson = lesson.nome.replace(':', ' -');
+    			let folderLesson = tratarTitulo(lesson.nome);
     			let url = await get_video(lesson.id, infos.slug, access_token);
     			logger.log(5, {lesson: lesson.nome, id: lesson.id})
-    			video_download(`${folderName}/${title.position} - ${title.titulo}/${lesson.position} - ${folderLesson}.mp4`, url, folderLesson)
+    			video_download(`${folderName}/${title.position} - ${tituloTratado}/${lesson.position} - ${folderLesson}.mp4`, url, folderLesson)
     		}
 
     	}
     }
 
+}
+
+function tratarTitulo(titulo) {
+	var textoSemAcentos = titulo.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+	var textoTratado = textoSemAcentos.replace(/[^\w\s]/gi, '');
+	return textoTratado;
 }
 
 /**
