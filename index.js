@@ -27,7 +27,7 @@ main();
     }
     
     logger.log(1, {email, password});
-    let access_token = await sign_in(email, password);
+    let { access_token, cookies } = await sign_in(email, password);
 
     if (!access_token) {
     	logger.log(2, {email, password});
@@ -39,7 +39,7 @@ main();
 
 
     for(let i = 0; i < courses.length; i++){
-    	let parse = await get_course(access_token, courses[i][1]);
+    	let parse = await get_course(access_token, cookies, courses[i][1]);
 
     	logger.log(8, {email, password});
     	let infos = JSON.parse(parse);
@@ -55,7 +55,7 @@ main();
 
     		for (const lesson of title.videos) {
     			let folderLesson = tratarTitulo(lesson.nome);
-    			let url = await get_video(lesson.id, infos.slug, access_token);
+    			let url = await get_video(lesson.id, infos.slug, access_token, cookies);
     			logger.log(5, {lesson: lesson.nome, id: lesson.id})
     			video_download(`${folderName}/${title.position} - ${tituloTratado}/${lesson.position} - ${folderLesson}.mp4`, url, folderLesson)
     		}
@@ -84,14 +84,22 @@ function tratarTitulo(titulo) {
  		body: `password=${pass}&client_secret=3de44ac5f5bccbcfba14a77181fbdbb9&client_id=br.com.alura.mobi&username=${mail}&grant_type=password`,
  		headers: {
  			'Content-Type': 'application/x-www-form-urlencoded',
- 			'User-Agent': 'alura-mobi/android',
+ 			'User-Agent': 'alura-mobi/android-79',
  			'Host': 'cursos.alura.com.br',
  			'Connection': 'Keep-Alive'
  		}
  	})
 
- 	if (res.body.includes('access_token'))
- 		return JSON.parse(res.body).access_token;
+  if (res.body.includes('access_token')) {
+    const access_token = JSON.parse(res.body).access_token;
+
+    const cookies = (res.response.headers['set-cookie'] || []).join(';');
+
+    return {
+      access_token,
+      cookies
+    }
+  }
 
  	return false
 
@@ -102,40 +110,50 @@ function tratarTitulo(titulo) {
  * @param {int} id 
  * @param {string} slug 
  * @param {string} token 
+ * @param {string} cookies 
  */
- async function get_video(id, slug, token) {
+async function get_video(id, slug, token, cookies) {
 
  	let res = await http_request({
  		url: `https://cursos.alura.com.br/mobile/courses/${slug}/busca-video-${id}`,
  		headers: {
  			'Content-Type': 'application/x-www-form-urlencoded',
- 			'User-Agent': 'alura-mobi/android',
+ 			'User-Agent': 'alura-mobi/android-79',
  			'Host': 'cursos.alura.com.br',
  			'Authorization': `Bearer ${token}`,
- 			'Connection': 'Keep-Alive'
+ 			'Connection': 'Keep-Alive',
+      "Cookie": cookies
  		}
  	});
 
- 	let [hd, sd] = JSON.parse(res.body);
- 	return hd.link;
+  const parsedBody = JSON.parse(res.body);
+
+  if (parsedBody.error)
+    return null;
+
+  let [hd] = parsedBody;
+
+  return hd.link;
 
  }
 
 /**
- * get course: video list and informations 
- * @param {sting} access_token 
+ * get course: video list and information 
+ * @param {string} access_token 
+ * @param {string} cookies 
  * @param {string} course 
  */
- async function get_course(access_token, course) {
+async function get_course(access_token, cookies, course) {
 
  	let res = await http_request({
  		url: `https://cursos.alura.com.br/mobile/v2/course/${course}`,
  		headers: {
  			'Content-Type': 'application/x-www-form-urlencoded',
- 			'User-Agent': 'alura-mobi/android',
+ 			'User-Agent': 'alura-mobi/android-79',
  			'Host': 'cursos.alura.com.br',
  			'Authorization': `Bearer ${access_token}`,
- 			'Connection': 'Keep-Alive'
+ 			'Connection': 'Keep-Alive',
+      "Cookie": cookies
  		}
  	})
 
