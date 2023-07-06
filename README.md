@@ -9,14 +9,14 @@ Você deseja ter a flexibilidade de assistir aos seus cursos da Alura em qualque
 <br>
 
 ## Funcionalidades
----
+
 - Multiplos donwnloads
 - Arquivos baixados organizados em pastas
 
 <br>
 
 ## Instalação e Execução
----
+
 Clonando o repositório do projeto:
 
     $ git clone https://github.com/SirSavio/alura-downloader.git
@@ -38,13 +38,13 @@ Inicie a aplicação:
 
    
 ## Preview
----
+
 ![App Screenshot](assets/preview.png)
 
 <br>
 
 ## Contribuições e Melhorias
----
+
 - Reportar bugs
 - Sugestões de funcionalidades
 - Corrija algo e abra uma pull request
@@ -53,14 +53,14 @@ Inicie a aplicação:
 <br>
 
 ## Considerações
----
+
 Os desenvolvedores não assumem nenhuma responsabilidade e não são responsáveis ​​por qualquer uso indevido. O Alura Video Downloader é apenas uma ferramenta de facilitação para alunos baixarem os cursos adquiridos na plataforma, permitindo que consigam dar sequência aos seus estudos, ainda que não tenham uma conexão de internet disponível.
 
 
 <br>
 
 ## Desenvolvedores
----
+
 * [@reinaldomoreira](https://github.com/reinaldomoreira)
 * [@v4p0r](https://github.com/v4p0r)
 * [@SirSavio](https://github.com/sirsavio)
