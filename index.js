@@ -84,7 +84,7 @@ function tratarTitulo(titulo) {
  		body: `password=${pass}&client_secret=3de44ac5f5bccbcfba14a77181fbdbb9&client_id=br.com.alura.mobi&username=${mail}&grant_type=password`,
  		headers: {
  			'Content-Type': 'application/x-www-form-urlencoded',
- 			'User-Agent': 'alura-mobi/android-79',
+ 			'User-Agent': 'alura-mobi/android',
  			'Host': 'cursos.alura.com.br',
  			'Connection': 'Keep-Alive'
  		}
