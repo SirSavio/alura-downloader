@@ -1,7 +1,16 @@
+/*
+
+Fill in your Alura login and password and paste the links to the courses that this user can access.
+
+If you want to download more than one course at the same time, just insert the links inside the array, between double quotes and separated by a comma.
+
+*/
+
+
 {
-	"email": "eeee@eeee.com.br",
-	"password": "wwwwww",
-	"courses": [
-		"https://cursos.alura.com.br/course/kubernetes-pods-services-configmap"
-	]
+  "email": "EMAIL",
+  "password": "PASSWORD",
+  "courses": [
+    "COURSE_LINK"
+  ]
 }
