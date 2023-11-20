@@ -50,19 +50,10 @@ async function main() {
                 let folderLesson = tratarTitulo(lesson.nome);
                 let url = await get_video(lesson.id, infos.slug, access_token, cookies);
                 logger.log(5, { lesson: lesson.nome, id: lesson.id });
-                video_download(`${folderName}/${title.position} - ${tituloTratado}/${lesson.position} - ${folderLesson}.mp4`, url, folderLesson);
-                // break the loop after downloading one video
-                break;
+                await video_download(`${folderName}/${title.position} - ${tituloTratado}/${lesson.position} - ${folderLesson}.mp4`, url, folderLesson);
             }
-            // break the loop after processing one section
-            break;
         }
-        // break the loop after processing one course
-        break;
     }
-    	}
-    }
-
 }
 
 function tratarTitulo(titulo) {
@@ -204,4 +195,3 @@ async function get_course(access_token, cookies, course) {
  		fs.mkdirSync(__dirname + '/' + dir);
  	}
  }
-
