@@ -3,63 +3,63 @@
 const request = require('request');
 const fs = require('fs');
 const axios = require('axios');
-const logger = require('./utils/logger')
+const logger = require('./utils/logger');
 
-let jsonData = fs.readFileSync("./config.json", "utf8");
-let data = JSON.parse(jsonData)
+let jsonData = fs.readFileSync('./config.json', 'utf8');
+let data = JSON.parse(jsonData);
 main();
 
-/**
- * main function, where the magic happens
- * @param {string} account 
- * @param {string} course 
- */
- async function main() {
-
+async function main() {
     let email = data['email'];
     let password = data['password'];
-    let courses = data['courses']
+    let courses = data['courses'];
 
-    logger.log(10, {email, password})
+    logger.log(10, { email, password });
 
     for (let i = courses.length - 1; i >= 0; i--) {
-    	courses[i] = courses[i].split('course/')
+        courses[i] = courses[i].split('course/');
     }
-    
-    logger.log(1, {email, password});
+
+    logger.log(1, { email, password });
     let { access_token, cookies } = await sign_in(email, password);
 
     if (!access_token) {
-    	logger.log(2, {email, password});
-    	return;
+        logger.log(2, { email, password });
+        return;
     }
 
-    logger.log(6, {email, password});
-    logger.log(7, {email, password});
+    logger.log(6, { email, password });
+    logger.log(7, { email, password });
 
+    for (let i = 0; i < courses.length; i++) {
+        let parse = await get_course(access_token, cookies, courses[i][1]);
 
-    for(let i = 0; i < courses.length; i++){
-    	let parse = await get_course(access_token, cookies, courses[i][1]);
+        logger.log(8, { email, password });
+        let infos = JSON.parse(parse);
 
-    	logger.log(8, {email, password});
-    	let infos = JSON.parse(parse);
+        logger.log(3, { id: infos.id, slug: infos.slug, name: infos.name, totalVideoTime: infos.totalVideoTime });
+        let folderName = tratarTitulo(infos.name);
+        create_folder(folderName);
 
-    	logger.log(3, {id: infos.id, slug: infos.slug, name: infos.name, totalVideoTime: infos.totalVideoTime});
-		let folderName = tratarTitulo(infos.name);
-    	create_folder(folderName)
+        for (const title of infos.sections) {
+            let tituloTratado = tratarTitulo(title.titulo);
+            logger.log(4, { title: tituloTratado });
+            create_folder(`${folderName}/${title.position} - ${tituloTratado}`);
 
-    	for (const title of infos.sections) {
-			let tituloTratado = tratarTitulo(title.titulo);
-    		logger.log(4, {title: tituloTratado});
-    		create_folder(`${folderName}/${title.position} - ${tituloTratado}`);
-
-    		for (const lesson of title.videos) {
-    			let folderLesson = tratarTitulo(lesson.nome);
-    			let url = await get_video(lesson.id, infos.slug, access_token, cookies);
-    			logger.log(5, {lesson: lesson.nome, id: lesson.id})
-    			video_download(`${folderName}/${title.position} - ${tituloTratado}/${lesson.position} - ${folderLesson}.mp4`, url, folderLesson)
-    		}
-
+            for (const lesson of title.videos) {
+                let folderLesson = tratarTitulo(lesson.nome);
+                let url = await get_video(lesson.id, infos.slug, access_token, cookies);
+                logger.log(5, { lesson: lesson.nome, id: lesson.id });
+                video_download(`${folderName}/${title.position} - ${tituloTratado}/${lesson.position} - ${folderLesson}.mp4`, url, folderLesson);
+                // break the loop after downloading one video
+                break;
+            }
+            // break the loop after processing one section
+            break;
+        }
+        // break the loop after processing one course
+        break;
+    }
     	}
     }
 
