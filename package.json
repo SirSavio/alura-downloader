@@ -17,6 +17,7 @@
   "dependencies": {
     "ansi-colors": "^4.1.1",
     "axios": "^0.19.2",
+    "hls-parser": "^0.10.8",
     "request": "^2.88.2"
   },
   "repository": {
