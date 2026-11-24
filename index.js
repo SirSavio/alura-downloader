@@ -8,6 +8,7 @@ const request = require('request');
 const axios = require('axios');
 const HLS = require('hls-parser');
 const logger = require('./utils/logger');
+const { createPdfRenderer } = require('./utils/lesson-pdf');
 
 const ALURA_ORIGIN = 'https://cursos.alura.com.br';
 const WEB_HEADERS = { 'User-Agent': 'Mozilla/5.0', Accept: 'application/json' };
@@ -32,29 +33,72 @@ async function main() {
   await signIn(session, email, password);
   logger.log(6);
 
-  for (const slug of courses) {
-    logger.log(7);
-    const { id, name, code, sections } = await getCourse(session, slug);
-    logger.log(3, { id, slug: code, name });
+  const pdfRenderer = createPdfRenderer();
+  const downloadedCourseIds = new Set();
+  try {
+    for (const slug of courses) {
+      logger.log(7);
+      const course = await getCourse(session, slug);
+      const courseId = String(course.id);
+      if (downloadedCourseIds.has(courseId)) continue;
 
-    const courseFolder = processTitle(name) || `Curso ${id}`;
-    for (const section of sections) {
-      const sectionTitle = processTitle(section.sectionName);
-      const sectionFolder = path.join(courseFolder, `${section.number} - ${sectionTitle}`.trimEnd());
-      logger.log(4, { title: sectionTitle });
+      await downloadCourse(session, course, pdfRenderer);
+      downloadedCourseIds.add(courseId);
+    }
+  } finally {
+    await pdfRenderer.close();
+  }
+}
 
-      for (const task of section.tasks) {
-        if (task.kind !== 'VIDEO' || task.locked) continue;
+async function downloadCourse(session, course, pdfRenderer) {
+  const { id, name, code, sections } = course;
+  logger.log(3, { id, slug: code, name });
 
-        const lessonTitle = processTitle(task.title);
-        const output = path.join(sectionFolder, `${task.position} - ${lessonTitle || task.id}.mp4`);
-        logger.log(5, { lesson: task.title, id: task.id });
-        const videoUrl = await getVideoUrl(session, code, task.id);
-        await downloadVideo(output, videoUrl);
-        logger.log(9, { title: output });
+  const courseFolder = processTitle(name) || `Curso ${id}`;
+  for (const section of sections) {
+    const sectionTitle = processTitle(section.sectionName);
+    const sectionFolder = path.join(courseFolder, `${section.number} - ${sectionTitle}`.trimEnd());
+    logger.log(4, { title: sectionTitle });
+
+    for (const task of section.tasks) {
+      if (task.kind !== 'VIDEO' || task.locked) continue;
+
+      const lessonTitle = processTitle(task.title);
+      const lessonPath = path.join(sectionFolder, `${task.position} - ${lessonTitle || task.id}`);
+      const videoPath = `${lessonPath}.mp4`;
+      logger.log(5, { lesson: task.title, id: task.id });
+      const videoUrl = await getVideoUrl(session, code, task.id);
+      await writeOutput(videoPath, (partial) => pipeline(
+        videoChunks(videoUrl), fs.createWriteStream(partial, { flags: 'wx' })
+      ));
+      logger.log(9, { title: videoPath });
+
+      try {
+        await saveLessonPdf(session, pdfRenderer, course, task, `${lessonPath}.pdf`);
+      } catch (error) {
+        console.error(`[ERRO] PDF da aula ${task.id} — ${error.message}`);
+        process.exitCode = 1;
       }
     }
   }
+}
+
+async function saveLessonPdf(session, renderer, course, task, output) {
+  const { content } = await webJson(
+    session,
+    `/classpage/api/v1/course/${course.id}/task/${task.id}`,
+    `Consulta do texto da aula ${task.id}`
+  );
+  const bytes = await renderer.render({
+    course: course.name,
+    title: task.title,
+    source: `${ALURA_ORIGIN}/classpage/${course.code}/task/${task.id}`,
+    content
+  });
+  if (!bytes) return;
+
+  await writeOutput(output, (partial) => fs.promises.writeFile(partial, bytes, { flag: 'wx' }));
+  logger.log(9, { title: output });
 }
 
 function readConfig() {
@@ -78,7 +122,7 @@ function readConfig() {
     if (!slug) throw new Error('Use o endereço /course/nome-do-curso em config.json.');
     return slug;
   });
-  return { email: config.email, password: config.password, courses };
+  return { email: config.email, password: config.password, courses: [...new Set(courses)] };
 }
 
 async function signIn(session, email, password) {
@@ -164,11 +208,11 @@ function parseJson(body, operation) {
   }
 }
 
-async function downloadVideo(output, url) {
+async function writeOutput(output, write) {
   await fs.promises.mkdir(path.dirname(output), { recursive: true });
   const partial = `${output}.${randomUUID()}.part`;
   try {
-    await pipeline(videoChunks(url), fs.createWriteStream(partial, { flags: 'wx' }));
+    await write(partial);
     await fs.promises.rename(partial, output);
   } catch (error) {
     await fs.promises.rm(partial, { force: true });
