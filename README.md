@@ -4,6 +4,7 @@
 # Funcionalidades
 - Download de vários cursos ao mesmo tempo
 - Separado por pastas
+- PDF com o texto complementar da videoaula, ao lado do MP4 e com o mesmo nome
 
 # Instalação
 
@@ -16,6 +17,10 @@ Antes de seguir o processo abaixo edite o config.json para as suas informações
 
     $ npm install
     $ node index.js
+
+A geração dos PDFs requer Node.js 20 ou superior e usa o Google Chrome ou o Microsoft Edge instalado. Se nenhum dos dois estiver disponível, instale o Chromium com `npx playwright-core install chromium`.
+
+Quando a Alura disponibiliza texto para a videoaula, o programa salva os dois arquivos na mesma pasta. Por exemplo, `1 - Apresentacao.mp4` e `1 - Apresentacao.pdf`.
 
 # Contribuições
 ### Maneiras de contribuir
